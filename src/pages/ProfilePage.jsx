@@ -55,10 +55,11 @@ export default function ProfilePage() {
 
   const startEdit = () => {
     setForm({
-      full_name: profile?.full_name || '',
-      gender:    profile?.gender || '',
-      dob:       profile?.dob || '',
-      country:   profile?.country || '',
+      full_name:       profile?.full_name || '',
+      gender:          profile?.gender || '',
+      dob:             profile?.dob || '',
+      country:         profile?.country || '',
+      github_username: profile?.github_username || '',
     })
     setEditing(true)
     setSaved(false)
@@ -128,6 +129,19 @@ export default function ProfilePage() {
           <h2 className="text-xl font-bold">{displayName}</h2>
           <p className="text-sm text-gray-400">{user?.email}</p>
           {profile?.country && <p className="text-xs text-gray-500 mt-0.5">🌍 {profile.country}</p>}
+          {profile?.github_username && (
+            <a
+              href={`https://github.com/${profile.github_username}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 mt-1 px-3 py-1 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-full text-xs text-gray-300 transition-colors"
+            >
+              <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.73.083-.73 1.205.085 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.76-1.604-2.665-.305-5.467-1.334-5.467-5.93 0-1.31.468-2.38 1.235-3.22-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.3 1.23A11.5 11.5 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.807 5.625-5.479 5.92.43.372.823 1.102.823 2.222 0 1.604-.015 2.896-.015 3.286 0 .322.216.694.825.576C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/>
+              </svg>
+              @{profile.github_username}
+            </a>
+          )}
         </div>
 
         {saved && <p className="text-xs text-green-400">✅ Profile updated!</p>}
@@ -162,17 +176,31 @@ export default function ProfilePage() {
         {!editing ? (
           <div className="space-y-3">
             {[
-              { label: 'Full Name',      value: profile?.full_name },
-              { label: 'Email',          value: user?.email },
-              { label: 'Gender',         value: profile?.gender },
-              { label: 'Date of Birth',  value: profile?.dob },
-              { label: 'Country',        value: profile?.country },
+              { label: 'Full Name',     value: profile?.full_name },
+              { label: 'Email',         value: user?.email },
+              { label: 'Gender',        value: profile?.gender },
+              { label: 'Date of Birth', value: profile?.dob },
+              { label: 'Country',       value: profile?.country },
             ].map(({ label, value }) => (
               <div key={label} className="flex justify-between items-start py-2 border-b border-gray-800/50">
                 <span className="text-xs text-gray-500">{label}</span>
                 <span className="text-sm text-white text-right max-w-[60%]">{value || '—'}</span>
               </div>
             ))}
+            <div className="flex justify-between items-center py-2">
+              <span className="text-xs text-gray-500">GitHub</span>
+              {profile?.github_username ? (
+                <a href={`https://github.com/${profile.github_username}`} target="_blank" rel="noreferrer"
+                  className="flex items-center gap-1.5 text-sm text-blue-400 hover:underline">
+                  <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current shrink-0" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.73.083-.73 1.205.085 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.76-1.604-2.665-.305-5.467-1.334-5.467-5.93 0-1.31.468-2.38 1.235-3.22-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.3 1.23A11.5 11.5 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.91 1.235 3.22 0 4.61-2.807 5.625-5.479 5.92.43.372.823 1.102.823 2.222 0 1.604-.015 2.896-.015 3.286 0 .322.216.694.825.576C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12z"/>
+                  </svg>
+                  @{profile.github_username}
+                </a>
+              ) : (
+                <span className="text-sm text-gray-600">—</span>
+              )}
+            </div>
           </div>
         ) : (
           <div className="space-y-3">
@@ -201,6 +229,20 @@ export default function ProfilePage() {
                 <option value="">Select country</option>
                 {COUNTRIES.map(c => <option key={c}>{c}</option>)}
               </select>
+            </div>
+
+            <div>
+              <label className="text-xs text-gray-400 mb-1 block">GitHub Username</label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">@</span>
+                <input
+                  type="text"
+                  value={form.github_username}
+                  onChange={e => setForm(f => ({ ...f, github_username: e.target.value.replace(/^@/, '') }))}
+                  placeholder="your-github-username"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-xl pl-7 pr-3 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+                />
+              </div>
             </div>
 
             {error && <p className="text-red-400 text-xs">{error}</p>}
