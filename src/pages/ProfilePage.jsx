@@ -283,30 +283,19 @@ export default function ProfilePage() {
         </div>
 
         {/* Reward info */}
-        <div className="bg-gray-800/60 border border-pink-500/10 rounded-xl p-3 space-y-2">
+        <div className="bg-gradient-to-br from-pink-900/30 to-yellow-900/20 border border-pink-500/20 rounded-xl p-4 space-y-3">
           <p className="text-xs text-pink-300 font-semibold uppercase tracking-wide">🎁 How You Earn</p>
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-pink-600/20 border border-pink-500/30 flex items-center justify-center shrink-0">
-                <span className="text-sm">👤</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-white font-medium">Friend signs up with your code</p>
-                <p className="text-xs text-gray-400">You instantly get</p>
-              </div>
-              <p className="text-base font-black text-pink-400 shrink-0">+{REFERRAL_BONUS} 🪙</p>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-yellow-500/20 border border-yellow-400/30 flex items-center justify-center shrink-0 text-lg">
+              🤝
             </div>
-            <div className="border-t border-gray-700/50" />
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-yellow-600/20 border border-yellow-500/30 flex items-center justify-center shrink-0">
-                <span className="text-sm">💳</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs text-white font-medium">Friend purchases {REFERRAL_PURCHASE_THRESHOLD} tokens</p>
-                <p className="text-xs text-gray-400">Bonus credited to you <span className="text-yellow-400 font-semibold">{REFERRAL_PURCHASE_BONUS} tokens</span></p>
-              </div>
-              <p className="text-base font-black text-yellow-400 shrink-0">+{REFERRAL_PURCHASE_BONUS} 🪙</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-white font-semibold leading-snug">
+                Friend signs up with your code &amp; purchases {REFERRAL_PURCHASE_THRESHOLD} tokens
+              </p>
+              <p className="text-xs text-gray-400 mt-0.5">You will get <span className="text-yellow-300 font-bold">{REFERRAL_PURCHASE_BONUS} free tokens</span> credited to your account</p>
             </div>
+            <p className="text-xl font-black text-yellow-400 shrink-0">+{REFERRAL_PURCHASE_BONUS}<br /><span className="text-xs font-normal text-gray-400">tokens</span></p>
           </div>
         </div>
 
