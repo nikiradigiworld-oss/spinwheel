@@ -42,10 +42,6 @@ export default function ProfilePage() {
       .then(({ count }) => setReferralCount(count || 0))
   }, [profile?.referral_code])
 
-  const referralLink = profile?.referral_code
-    ? `${window.location.origin}${window.location.pathname}#/register?ref=${profile.referral_code}`
-    : ''
-
   const copyReferral = async () => {
     if (!profile?.referral_code) return
     await navigator.clipboard.writeText(profile.referral_code)
