@@ -382,22 +382,6 @@ export default function Dashboard() {
         {/* Spin window status banner */}
         <SpinStatusBanner status={windowStatus} />
 
-        {/* Spins counter */}
-        <div className="bg-gradient-to-br from-sky-600 to-sky-800 rounded-2xl p-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">⚡</span>
-            <div>
-              <p className="text-xs text-white/70 font-medium">Spins Left Today</p>
-              <p className="text-2xl font-bold">{spinsLeft} <span className="text-sm font-normal text-white/50">/ {MAX_DAILY_SPINS}</span></p>
-            </div>
-          </div>
-          <div className="flex gap-1.5 flex-wrap justify-end max-w-[140px]">
-            {Array.from({ length: MAX_DAILY_SPINS }).map((_, i) => (
-              <div key={i} className={`w-3 h-3 rounded-full ${i < spinsUsedToday ? 'bg-white/30' : 'bg-white'}`} />
-            ))}
-          </div>
-        </div>
-
         {/* Spin wheel */}
         <div className="bg-gray-900 rounded-2xl p-5 border border-gray-800 flex flex-col items-center gap-3">
           <div className="flex items-center gap-3 w-full justify-between">
@@ -447,6 +431,22 @@ export default function Dashboard() {
               </button>
             </>
           )}
+        </div>
+
+        {/* Spins counter */}
+        <div className="bg-gradient-to-br from-sky-600 to-sky-800 rounded-2xl p-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">⚡</span>
+            <div>
+              <p className="text-xs text-white/70 font-medium">Spins Left Today</p>
+              <p className="text-2xl font-bold">{spinsLeft} <span className="text-sm font-normal text-white/50">/ {MAX_DAILY_SPINS}</span></p>
+            </div>
+          </div>
+          <div className="flex gap-1.5 flex-wrap justify-end max-w-[140px]">
+            {Array.from({ length: MAX_DAILY_SPINS }).map((_, i) => (
+              <div key={i} className={`w-3 h-3 rounded-full ${i < spinsUsedToday ? 'bg-white/30' : 'bg-white'}`} />
+            ))}
+          </div>
         </div>
       </div>
     </>
