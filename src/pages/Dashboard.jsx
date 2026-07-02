@@ -348,8 +348,13 @@ export default function Dashboard() {
       </AnimatePresence>
 
       <div className="space-y-4 pb-4">
-        {/* Spin window status banner */}
-        <SpinStatusBanner status={windowStatus} />
+        {/* Welcome */}
+        <div className="mt-1">
+          <h2 className="text-lg font-bold">
+            Welcome{user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name}` : ''} 👋
+          </h2>
+          <p className="text-xs text-gray-400">{user?.email}</p>
+        </div>
 
         {/* News ticker */}
         {announcements.length > 0 && (
@@ -374,13 +379,8 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Welcome */}
-        <div className="mt-1">
-          <h2 className="text-lg font-bold">
-            Welcome{user?.user_metadata?.full_name ? `, ${user.user_metadata.full_name}` : ''} 👋
-          </h2>
-          <p className="text-xs text-gray-400">{user?.email}</p>
-        </div>
+        {/* Spin window status banner */}
+        <SpinStatusBanner status={windowStatus} />
 
         {/* Spins counter */}
         <div className="bg-gradient-to-br from-sky-600 to-sky-800 rounded-2xl p-4 flex items-center justify-between">
