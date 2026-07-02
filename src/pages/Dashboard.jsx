@@ -4,15 +4,18 @@ import { useAuth } from '../contexts/AuthContext'
 import { useTokens } from '../hooks/useTokens'
 import { useProfile } from '../hooks/useProfile'
 import { supabase } from '../lib/supabase'
-import { SPIN_SEGMENTS } from '../lib/constants'
+import { SPIN_SEGMENTS, SPIN_ENTRY_FEE, MAX_ZEROS_PER_DAY } from '../lib/constants'
 import { getSpinWindowStatus, formatCountdown, MAX_DAILY_SPINS } from '../lib/spintime'
 import Avatar from '../components/Avatar'
 
-function pickSegment() {
-  const total = SPIN_SEGMENTS.reduce((s, x) => s + x.weight, 0)
+function pickSegment(zerosToday) {
+  const pool = zerosToday >= MAX_ZEROS_PER_DAY
+    ? SPIN_SEGMENTS.filter(s => s.value !== 0)
+    : SPIN_SEGMENTS
+  const total = pool.reduce((s, x) => s + x.weight, 0)
   let r = Math.random() * total
-  for (const seg of SPIN_SEGMENTS) { r -= seg.weight; if (r <= 0) return seg }
-  return SPIN_SEGMENTS[0]
+  for (const seg of pool) { r -= seg.weight; if (r <= 0) return seg }
+  return pool[pool.length - 1]
 }
 
 function SpinWheel({ spinning, spinDegrees, resultIndex }) {
@@ -49,8 +52,8 @@ function SpinWheel({ spinning, spinDegrees, resultIndex }) {
                 opacity={!spinning && resultIndex !== null && !isResult ? 0.5 : 1}
               />
               <text x={tx} y={ty} textAnchor="middle" dominantBaseline="middle"
-                fill="white" fontSize={seg.value === 0 ? 8 : 13} fontWeight="bold">
-                {seg.value === 0 ? 'Try Again' : seg.label}
+                fill="white" fontSize={9} fontWeight="bold">
+                {seg.label}
               </text>
             </g>
           )
@@ -222,9 +225,12 @@ export default function Dashboard() {
   }, [])
 
   const today = new Date().toISOString().split('T')[0]
-  const spinsUsedToday = tokens?.last_spin_date === today ? (tokens?.spins_today ?? 0) : 0
+  const isToday = tokens?.last_spin_date === today
+  const spinsUsedToday = isToday ? (tokens?.spins_today ?? 0) : 0
+  const zerosToday = isToday ? (tokens?.zeros_today ?? 0) : 0
   const spinsLeft = MAX_DAILY_SPINS - spinsUsedToday
-  const canSpin = spinsLeft > 0 && windowStatus.isOpen
+  const hasEnoughBalance = (tokens?.balance ?? 0) >= SPIN_ENTRY_FEE
+  const canSpin = spinsLeft > 0 && windowStatus.isOpen && hasEnoughBalance
 
   const displayName = profile?.full_name || user?.user_metadata?.full_name || 'User'
 
@@ -235,7 +241,7 @@ export default function Dashboard() {
     setResultIndex(null)
     setShowCelebration(false)
 
-    const chosen = pickSegment()
+    const chosen = pickSegment(zerosToday)
     const idx = SPIN_SEGMENTS.indexOf(chosen)
 
     const segmentAngle = 360 / SPIN_SEGMENTS.length
@@ -251,20 +257,24 @@ export default function Dashboard() {
       if (chosen.value > 0) setShowCelebration(true)
       try {
         const newSpinsToday = spinsUsedToday + 1
+        const newZerosToday = chosen.value === 0 ? zerosToday + 1 : zerosToday
+        const netBalance = (tokens?.balance || 0) - SPIN_ENTRY_FEE + chosen.value
         await supabase.from('user_tokens').upsert({
           user_id: user.id,
           last_spin_date: today,
           spins_today: newSpinsToday,
+          zeros_today: newZerosToday,
           total_earned: (tokens?.total_earned || 0) + chosen.value,
-          balance: (tokens?.balance || 0) + chosen.value,
+          balance: netBalance,
           total_withdrawn: tokens?.total_withdrawn || 0,
         }, { onConflict: 'user_id' })
 
-        if (chosen.value > 0) {
-          await supabase.from('transactions').insert({
-            user_id: user.id, type: 'spin_win', amount: chosen.value, status: 'completed',
-          })
-        }
+        await supabase.from('transactions').insert({
+          user_id: user.id,
+          type: chosen.value > 0 ? 'spin_win' : 'spin_loss',
+          amount: chosen.value - SPIN_ENTRY_FEE,
+          status: 'completed',
+        })
         refetch()
       } catch (err) {
         setError(err.message)
@@ -338,7 +348,12 @@ export default function Dashboard() {
 
         {/* Spin wheel */}
         <div className="bg-gray-900 rounded-2xl p-5 border border-gray-800 flex flex-col items-center gap-3">
-          <h2 className="font-semibold text-lg">Spin the Wheel</h2>
+          <div className="flex items-center gap-3 w-full justify-between">
+            <h2 className="font-semibold text-lg">Spin the Wheel</h2>
+            <div className="flex items-center gap-1.5 bg-yellow-900/40 border border-yellow-600/40 rounded-full px-3 py-1">
+              <span className="text-yellow-400 text-xs font-bold">🎟 Entry: {SPIN_ENTRY_FEE} tokens</span>
+            </div>
+          </div>
 
           <div className="bg-gray-800 rounded-xl px-4 py-3 w-full">
             <Countdown status={windowStatus} />
@@ -349,9 +364,11 @@ export default function Dashboard() {
           {result && !spinning && (
             <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
               className={`text-center py-2 px-6 rounded-full font-bold text-lg ${
-                result.value > 0 ? 'bg-green-900 text-green-300' : 'bg-gray-800 text-gray-300'
+                result.value > 0 ? 'bg-green-900 text-green-300' : 'bg-red-900/50 text-red-300'
               }`}>
-              {result.value > 0 ? `🎉 +${result.value} Tokens Won!` : '😔 Try Again!'}
+              {result.value > 0
+                ? `🎉 +${result.value} tokens won!`
+                : `😔 No win — lost ${SPIN_ENTRY_FEE} tokens`}
             </motion.div>
           )}
 
@@ -362,7 +379,8 @@ export default function Dashboard() {
             {spinning ? 'Spinning...'
               : !windowStatus.isOpen ? 'Window Closed ⏰'
               : spinsLeft === 0 ? 'No Spins Left Today'
-              : 'SPIN NOW 🎡'}
+              : !hasEnoughBalance ? `Need ${SPIN_ENTRY_FEE} Tokens to Spin`
+              : `SPIN NOW 🎡 (−${SPIN_ENTRY_FEE})`}
           </button>
         </div>
       </div>
