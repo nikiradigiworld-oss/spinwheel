@@ -132,21 +132,21 @@
   0%   { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
 }
-@keyframes rainbow-shift {
-  0%   { background-position: 0% center; }
-  100% { background-position: 200% center; }
+@keyframes rainbow-color {
+  0%   { color: #ff4444; }
+  16%  { color: #ff9900; }
+  33%  { color: #ffee00; }
+  50%  { color: #00dd66; }
+  66%  { color: #00ccff; }
+  83%  { color: #cc44ff; }
+  100% { color: #ff4444; }
 }
 .news-scroll {
   display: inline-block;
   white-space: nowrap;
   font-size: 1.2rem;
   font-weight: 900;
-  background: linear-gradient(90deg, #ff0000, #ff7700, #ffff00, #00ff00, #00bfff, #8a2be2, #ff00ff, #ff0000);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: news-scroll 18s linear infinite, rainbow-shift 3s linear infinite;
+  animation: news-scroll 18s linear infinite, rainbow-color 2s linear infinite;
 }
 
 /* Glass card style */
