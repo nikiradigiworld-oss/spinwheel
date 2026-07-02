@@ -1,4 +1,4 @@
-export const MAX_DAILY_SPINS = 5
+export const MAX_DAILY_SPINS = 10
 
 // Spin window: always open (24 hours)
 export function getSpinWindowStatus() {
