@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import AuthPage from './pages/AuthPage'
 import SignupPage from './pages/SignupPage'
@@ -40,7 +40,7 @@ export default function App() {
     <AuthProvider>
       <BgScene />
       <div className="app-content">
-        <BrowserRouter>
+        <HashRouter>
           <Routes>
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/register" element={<SignupPage />} />
@@ -55,7 +55,7 @@ export default function App() {
             </Route>
             <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
           </Routes>
-        </BrowserRouter>
+        </HashRouter>
       </div>
     </AuthProvider>
   )
