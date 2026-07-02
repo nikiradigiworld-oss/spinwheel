@@ -43,7 +43,7 @@ export default function ProfilePage() {
   }, [profile?.referral_code])
 
   const referralLink = profile?.referral_code
-    ? `${window.location.origin}/register?ref=${profile.referral_code}`
+    ? `${window.location.origin}${window.location.pathname}#/register?ref=${profile.referral_code}`
     : ''
 
   const copyReferral = async () => {
