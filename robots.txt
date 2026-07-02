@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Public pages
+Allow: /auth
+Allow: /register
+
+# Block private pages from indexing
+Disallow: /admin
+
+Sitemap: https://spinwheel.vercel.app/sitemap.xml
