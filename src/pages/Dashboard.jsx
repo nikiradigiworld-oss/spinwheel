@@ -222,21 +222,16 @@ function NewsCarousel({ announcements }) {
 
   return (
     <div className="bg-gray-900 border border-yellow-500/30 rounded-2xl overflow-hidden">
-      <div className="flex items-center gap-2 bg-yellow-500/10 border-b border-yellow-500/20 px-4 py-2">
-        <span className="text-yellow-400 text-base">📢</span>
-        <span className="text-yellow-300 text-xs font-black uppercase tracking-widest">Daily News</span>
+      <div key={key} className="news-fade px-4 py-3 flex items-center justify-between gap-2">
+        <p className="text-sm font-bold text-white flex-1 min-w-0">{a.message || a.title}</p>
         {announcements.length > 1 && (
-          <div className="ml-auto flex gap-1">
+          <div className="flex gap-1 shrink-0">
             {announcements.map((_, i) => (
               <button key={i} onClick={() => { setIdx(i); setKey(k => k + 1) }}
-                className={`w-1.5 h-1.5 rounded-full transition-all ${i === idx ? 'bg-yellow-400 w-3' : 'bg-gray-600'}`} />
+                className={`h-1.5 rounded-full transition-all ${i === idx ? 'bg-yellow-400 w-3' : 'bg-gray-600 w-1.5'}`} />
             ))}
           </div>
         )}
-      </div>
-      <div key={key} className="news-fade px-4 py-3">
-        <p className="text-sm font-bold text-white">{a.title}</p>
-        {a.message && <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{a.message}</p>}
       </div>
     </div>
   )
