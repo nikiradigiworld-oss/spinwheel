@@ -19,6 +19,11 @@ export function AuthProvider({ children }) {
     })
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
+      // When Supabase redirects back after password reset email click,
+      // the token lands in the URL hash — redirect to the reset page
+      if (_event === 'PASSWORD_RECOVERY') {
+        window.location.hash = '/reset-password'
+      }
     })
     return () => subscription.unsubscribe()
   }, [])
@@ -105,9 +110,9 @@ export function AuthProvider({ children }) {
   }
 
   const forgotPassword = async (email) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    })
+    // Use origin + pathname so it works on both GitHub Pages (/spinwheel/) and localhost (/)
+    const redirectTo = window.location.origin + window.location.pathname
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo })
     if (error) throw error
   }
 
