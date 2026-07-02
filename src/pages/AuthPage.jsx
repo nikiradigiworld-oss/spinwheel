@@ -106,14 +106,9 @@ export default function AuthPage() {
 
             {/* Title with shimmer glow animation */}
             <div className="relative inline-block">
-              <motion.h1
-                className="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight relative z-10"
-                style={{ background: 'linear-gradient(135deg, #f472b6 0%, #e879f9 40%, #c084fc 70%, #f472b6 100%)', backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
-                animate={{ backgroundPosition: ['0% center', '200% center', '0% center'] }}
-                transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
-              >
+              <h1 className="shimmer-text text-4xl md:text-5xl font-extrabold tracking-tight leading-tight relative z-10">
                 Spin &amp; SIP Money
-              </motion.h1>
+              </h1>
               {/* Glow behind title */}
               <motion.div
                 className="absolute inset-0 blur-2xl -z-10"
@@ -126,19 +121,15 @@ export default function AuthPage() {
             {/* Spin · Win · Earn — each word pops individually */}
             <div className="flex items-center justify-center gap-1 mt-3">
               {[
-                { word: 'Spin', color: '#f472b6', shadow: 'rgba(244,114,182,0.8)' },
-                { word: 'Win',  color: '#e879f9', shadow: 'rgba(232,121,249,0.8)' },
-                { word: 'Earn', color: '#c084fc', shadow: 'rgba(192,132,252,0.8)' },
-              ].map(({ word, color, shadow }, i) => (
+                { word: 'Spin', color: '#f472b6' },
+                { word: 'Win',  color: '#e879f9' },
+                { word: 'Earn', color: '#c084fc' },
+              ].map(({ word, color }, i) => (
                 <div key={word} className="flex items-center gap-1">
                   <motion.span
                     className="text-lg font-black tracking-[0.2em] uppercase"
                     style={{ color }}
-                    animate={{
-                      scale:      [1, 1.25, 1],
-                      textShadow: [`0 0 0px ${shadow}`, `0 0 20px ${shadow}`, `0 0 0px ${shadow}`],
-                      y:          [0, -6, 0],
-                    }}
+                    animate={{ scale: [1, 1.25, 1], y: [0, -6, 0], opacity: [0.7, 1, 0.7] }}
                     transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.5, ease: 'easeInOut' }}
                   >
                     {word}
@@ -155,27 +146,7 @@ export default function AuthPage() {
             </div>
           </div>
 
-          {/* Golden glow behind image */}
-          <div className="absolute w-80 h-80 rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.2) 0%, rgba(236,72,153,0.1) 50%, transparent 70%)', filter: 'blur(50px)' }} />
-
-          {/* Hero image wrapper */}
-          <div className="relative flex items-end justify-center">
-
-            {/* The hero image */}
-            <motion.img
-              src="/hero.png"
-              alt="Earn money online"
-              className="w-80 h-auto relative z-10"
-              style={{
-                filter: 'drop-shadow(0 20px 60px rgba(245,158,11,0.35)) drop-shadow(0 0 40px rgba(236,72,153,0.2))',
-              }}
-              animate={{ y: [0, -12, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-            />
-          </div>
-
-          {/* Stats below image */}
+          {/* Stats below title */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
