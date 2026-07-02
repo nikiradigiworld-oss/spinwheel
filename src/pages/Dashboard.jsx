@@ -351,21 +351,25 @@ export default function Dashboard() {
         {/* Spin window status banner */}
         <SpinStatusBanner status={windowStatus} />
 
-        {/* News / Announcements */}
+        {/* News ticker */}
         {announcements.length > 0 && (
-          <div className="bg-gray-900 rounded-2xl border border-blue-500/20 overflow-hidden">
-            <div className="bg-blue-900/30 border-b border-blue-500/20 px-4 py-2.5 flex items-center gap-2">
-              <span className="text-base">📢</span>
-              <p className="text-xs font-bold text-blue-300 uppercase tracking-widest">Daily News</p>
+          <div className="flex items-center rounded-2xl border border-yellow-500/30 bg-gray-900 overflow-hidden h-11">
+            <div className="shrink-0 flex items-center gap-1.5 px-3 h-full bg-yellow-500 rounded-l-2xl">
+              <span className="text-black text-sm">📢</span>
+              <span className="text-black text-xs font-black uppercase tracking-wide whitespace-nowrap">News</span>
             </div>
-            <div className="divide-y divide-gray-800/60">
-              {announcements.map(a => (
-                <div key={a.id} className="px-4 py-3 space-y-0.5">
-                  <p className="text-sm font-semibold text-white">{a.title}</p>
-                  {a.message && <p className="text-xs text-gray-400 leading-relaxed">{a.message}</p>}
-                  <p className="text-xs text-gray-600">{new Date(a.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-                </div>
-              ))}
+            <div className="overflow-hidden flex-1 h-full flex items-center">
+              <div className="ticker-track">
+                {[...announcements, ...announcements].map((a, i) => (
+                  <span key={i} className="flex items-center text-sm font-bold text-white whitespace-nowrap">
+                    <span className="text-yellow-400 mx-4">★</span>
+                    {a.title}
+                    {a.message && (
+                      <span className="font-normal text-gray-300"> — {a.message}</span>
+                    )}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         )}
