@@ -132,10 +132,22 @@
   0%   { transform: translateX(100%); }
   100% { transform: translateX(-100%); }
 }
+@keyframes rainbow-shift {
+  0%   { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
 .news-scroll {
   display: inline-block;
   white-space: nowrap;
   animation: news-scroll 18s linear infinite;
+  font-size: 1.2rem;
+  font-weight: 900;
+  background: linear-gradient(90deg, #ff0000, #ff7700, #ffff00, #00ff00, #00bfff, #8a2be2, #ff00ff, #ff0000);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: news-scroll 18s linear infinite, rainbow-shift 3s linear infinite;
 }
 
 /* Glass card style */
