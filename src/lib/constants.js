@@ -16,4 +16,5 @@ export const SPIN_SEGMENTS = [
 ]
 
 export const MIN_WITHDRAW_TOKENS = 200
-export const TDS_PERCENT = 1 // TDS deduction on withdrawal
+export const TDS_PERCENT = 1
+export const REFERRAL_BONUS = 10  // tokens credited to referrer per successful signup

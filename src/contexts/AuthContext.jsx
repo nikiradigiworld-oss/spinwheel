@@ -1,6 +1,10 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { ADMIN_EMAIL } from '../lib/constants'
+import { ADMIN_EMAIL, REFERRAL_BONUS } from '../lib/constants'
+
+function generateReferralCode() {
+  return Math.random().toString(36).slice(2, 9).toUpperCase()
+}
 
 const AuthContext = createContext(null)
 
@@ -19,7 +23,7 @@ export function AuthProvider({ children }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  const signUp = async ({ email, password, fullName, gender, dob, country, avatarFile }) => {
+  const signUp = async ({ email, password, fullName, gender, dob, country, avatarFile, referralCode }) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -27,6 +31,7 @@ export function AuthProvider({ children }) {
     })
     if (error) throw error
     if (data.user) {
+      // Upload avatar if provided and session exists
       let avatarUrl = null
       if (avatarFile && data.session) {
         const ext = avatarFile.name.split('.').pop()
@@ -37,14 +42,59 @@ export function AuthProvider({ children }) {
           avatarUrl = publicUrl + '?t=' + Date.now()
         }
       }
-      await supabase.from('profiles').upsert(
-        { user_id: data.user.id, full_name: fullName, gender, dob, country, ...(avatarUrl ? { avatar_url: avatarUrl } : {}) },
-        { onConflict: 'user_id' }
-      )
+
+      const myReferralCode = generateReferralCode()
+
+      // Save profile with own referral code + who referred them
+      await supabase.from('profiles').upsert({
+        user_id: data.user.id,
+        full_name: fullName,
+        gender,
+        dob,
+        country,
+        referral_code: myReferralCode,
+        ...(referralCode ? { referred_by: referralCode.toUpperCase() } : {}),
+        ...(avatarUrl   ? { avatar_url: avatarUrl }                     : {}),
+      }, { onConflict: 'user_id' })
+
       await supabase.from('user_tokens').upsert(
         { user_id: data.user.id },
         { onConflict: 'user_id' }
       )
+
+      // Credit referrer if a valid code was used
+      if (referralCode) {
+        const { data: referrer } = await supabase
+          .from('profiles')
+          .select('user_id')
+          .eq('referral_code', referralCode.toUpperCase())
+          .neq('user_id', data.user.id)
+          .single()
+
+        if (referrer) {
+          const { data: refTokens } = await supabase
+            .from('user_tokens')
+            .select('*')
+            .eq('user_id', referrer.user_id)
+            .single()
+
+          await supabase.from('user_tokens').upsert({
+            user_id:         referrer.user_id,
+            referral_tokens: (refTokens?.referral_tokens || 0) + REFERRAL_BONUS,
+            total_earned:    (refTokens?.total_earned    || 0) + REFERRAL_BONUS,
+            balance:         (refTokens?.balance         || 0) + REFERRAL_BONUS,
+            total_purchased: refTokens?.total_purchased || 0,
+            total_withdrawn: refTokens?.total_withdrawn || 0,
+          }, { onConflict: 'user_id' })
+
+          await supabase.from('transactions').insert({
+            user_id: referrer.user_id,
+            type:    'referral',
+            amount:  REFERRAL_BONUS,
+            status:  'completed',
+          })
+        }
+      }
     }
     return data
   }

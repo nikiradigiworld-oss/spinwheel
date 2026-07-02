@@ -1,10 +1,12 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { useProfile } from '../hooks/useProfile'
 import { useTokens } from '../hooks/useTokens'
+import { supabase } from '../lib/supabase'
 import { COUNTRIES } from '../lib/countries'
+import { REFERRAL_BONUS } from '../lib/constants'
 import Avatar from '../components/Avatar'
 
 const STAT_CARDS = [
@@ -28,6 +30,28 @@ export default function ProfilePage() {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
+  const [referralCount, setReferralCount] = useState(0)
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    if (!profile?.referral_code) return
+    supabase
+      .from('profiles')
+      .select('user_id', { count: 'exact', head: true })
+      .eq('referred_by', profile.referral_code)
+      .then(({ count }) => setReferralCount(count || 0))
+  }, [profile?.referral_code])
+
+  const referralLink = profile?.referral_code
+    ? `${window.location.origin}/register?ref=${profile.referral_code}`
+    : ''
+
+  const copyReferral = async () => {
+    if (!referralLink) return
+    await navigator.clipboard.writeText(referralLink)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const startEdit = () => {
     setForm({
@@ -193,6 +217,51 @@ export default function ProfilePage() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Referral section */}
+      <div className="bg-gray-900/80 rounded-2xl border border-pink-500/20 p-5 space-y-4">
+        <div className="flex items-center gap-2">
+          <span className="text-lg">🤝</span>
+          <h3 className="font-semibold">Refer &amp; Earn</h3>
+        </div>
+
+        <div className="bg-pink-900/20 border border-pink-500/20 rounded-xl p-3 text-center space-y-1">
+          <p className="text-xs text-gray-400">Your Referral Code</p>
+          <p className="text-2xl font-black tracking-widest text-pink-300 font-mono">
+            {profile?.referral_code || '—'}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 text-center text-sm">
+          <div className="bg-gray-800 rounded-xl py-3">
+            <p className="text-xl font-bold text-pink-400">{referralCount}</p>
+            <p className="text-xs text-gray-500">Friends Joined</p>
+          </div>
+          <div className="bg-gray-800 rounded-xl py-3">
+            <p className="text-xl font-bold text-pink-400">{tokens?.referral_tokens ?? 0}</p>
+            <p className="text-xs text-gray-500">Tokens Earned</p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-xs text-gray-400">
+            Share your link — you earn <span className="text-pink-300 font-semibold">{REFERRAL_BONUS} tokens</span> for every friend who joins!
+          </p>
+          <div className="flex gap-2">
+            <input
+              readOnly
+              value={referralLink}
+              className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-300 font-mono truncate"
+            />
+            <button
+              onClick={copyReferral}
+              className="px-3 py-2 bg-pink-700 hover:bg-pink-600 rounded-xl text-xs font-semibold transition-colors whitespace-nowrap"
+            >
+              {copied ? '✅ Copied!' : '📋 Copy'}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Sign out */}
