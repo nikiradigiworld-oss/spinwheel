@@ -418,8 +418,8 @@ function NewsTab() {
                 </div>
                 <div className="flex gap-2 shrink-0">
                   <button onClick={() => toggle(a)}
-                    className={`text-xs px-2 py-1 rounded-lg border transition-colors ${a.active ? 'border-green-500/40 text-green-400 hover:bg-green-900/20' : 'border-gray-600 text-gray-500 hover:bg-gray-800'}`}>
-                    {a.active ? 'Live' : 'Hidden'}
+                    className={`text-xs px-2 py-1 rounded-lg border transition-colors ${a.active ? 'border-red-500/40 text-red-400 hover:bg-red-900/20' : 'border-green-500/40 text-green-400 hover:bg-green-900/20'}`}>
+                    {a.active ? 'Hide' : 'Show'}
                   </button>
                   <button onClick={() => remove(a.id)}
                     className="text-xs px-2 py-1 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-900/20 transition-colors">
