@@ -208,7 +208,7 @@ function CelebrationOverlay({ result, avatarSrc, displayName, onDismiss }) {
 function NewsCarousel({ announcements }) {
   const text = announcements.map(a => a.message || a.title).join('   ✦   ')
   return (
-    <div className="bg-gray-900 border border-yellow-500/30 rounded-2xl overflow-hidden py-3 px-0">
+    <div className="overflow-hidden py-2">
       <div className="overflow-hidden">
         <span className="news-scroll text-sm font-bold text-white">{text}</span>
       </div>
