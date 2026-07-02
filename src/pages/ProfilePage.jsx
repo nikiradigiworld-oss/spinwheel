@@ -6,7 +6,7 @@ import { useProfile } from '../hooks/useProfile'
 import { useTokens } from '../hooks/useTokens'
 import { supabase } from '../lib/supabase'
 import { COUNTRIES } from '../lib/countries'
-import { REFERRAL_BONUS } from '../lib/constants'
+import { REFERRAL_BONUS, REFERRAL_PURCHASE_BONUS, REFERRAL_PURCHASE_THRESHOLD } from '../lib/constants'
 import Avatar from '../components/Avatar'
 
 const STAT_CARDS = [
@@ -282,17 +282,40 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="space-y-2">
-          <p className="text-xs text-gray-400 text-center">
-            Share your code — earn <span className="text-pink-300 font-semibold">{REFERRAL_BONUS} tokens</span> per friend who joins!
-          </p>
-          <button
-            onClick={copyReferral}
-            className="w-full px-3 py-2 bg-pink-700 hover:bg-pink-600 rounded-xl text-sm font-semibold transition-colors"
-          >
-            {copied ? '✅ Code Copied!' : '📋 Copy Referral Code'}
-          </button>
+        {/* Reward info */}
+        <div className="bg-gray-800/60 border border-pink-500/10 rounded-xl p-3 space-y-2">
+          <p className="text-xs text-pink-300 font-semibold uppercase tracking-wide">🎁 How You Earn</p>
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-pink-600/20 border border-pink-500/30 flex items-center justify-center shrink-0">
+                <span className="text-sm">👤</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-white font-medium">Friend signs up with your code</p>
+                <p className="text-xs text-gray-400">You instantly get</p>
+              </div>
+              <p className="text-base font-black text-pink-400 shrink-0">+{REFERRAL_BONUS} 🪙</p>
+            </div>
+            <div className="border-t border-gray-700/50" />
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-yellow-600/20 border border-yellow-500/30 flex items-center justify-center shrink-0">
+                <span className="text-sm">💳</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-white font-medium">Friend purchases {REFERRAL_PURCHASE_THRESHOLD}+ tokens</p>
+                <p className="text-xs text-gray-400">Bonus credited to you</p>
+              </div>
+              <p className="text-base font-black text-yellow-400 shrink-0">+{REFERRAL_PURCHASE_BONUS} 🪙</p>
+            </div>
+          </div>
         </div>
+
+        <button
+          onClick={copyReferral}
+          className="w-full px-3 py-2 bg-pink-700 hover:bg-pink-600 rounded-xl text-sm font-semibold transition-colors"
+        >
+          {copied ? '✅ Code Copied!' : '📋 Copy Referral Code'}
+        </button>
       </div>
 
       {/* Sign out */}
