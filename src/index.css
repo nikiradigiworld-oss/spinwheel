@@ -127,6 +127,17 @@
   animation: news-fade-in 0.5s ease forwards;
 }
 
+/* News scroll */
+@keyframes news-scroll {
+  0%   { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+.news-scroll {
+  display: inline-block;
+  white-space: nowrap;
+  animation: news-scroll 18s linear infinite;
+}
+
 /* Glass card style */
 .glass {
   background: rgba(255, 255, 255, 0.04);

@@ -206,32 +206,11 @@ function CelebrationOverlay({ result, avatarSrc, displayName, onDismiss }) {
 }
 
 function NewsCarousel({ announcements }) {
-  const [idx, setIdx] = useState(0)
-  const [key, setKey] = useState(0)
-
-  useEffect(() => {
-    if (announcements.length <= 1) return
-    const id = setInterval(() => {
-      setIdx(i => (i + 1) % announcements.length)
-      setKey(k => k + 1)
-    }, 4000)
-    return () => clearInterval(id)
-  }, [announcements.length])
-
-  const a = announcements[idx]
-
+  const text = announcements.map(a => a.message || a.title).join('   ✦   ')
   return (
-    <div className="bg-gray-900 border border-yellow-500/30 rounded-2xl overflow-hidden">
-      <div key={key} className="news-fade px-4 py-3 flex items-center justify-between gap-2">
-        <p className="text-sm font-bold text-white flex-1 min-w-0">{a.message || a.title}</p>
-        {announcements.length > 1 && (
-          <div className="flex gap-1 shrink-0">
-            {announcements.map((_, i) => (
-              <button key={i} onClick={() => { setIdx(i); setKey(k => k + 1) }}
-                className={`h-1.5 rounded-full transition-all ${i === idx ? 'bg-yellow-400 w-3' : 'bg-gray-600 w-1.5'}`} />
-            ))}
-          </div>
-        )}
+    <div className="bg-gray-900 border border-yellow-500/30 rounded-2xl overflow-hidden py-3 px-0">
+      <div className="overflow-hidden">
+        <span className="news-scroll text-sm font-bold text-white">{text}</span>
       </div>
     </div>
   )
