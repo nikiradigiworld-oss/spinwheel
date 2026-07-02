@@ -210,7 +210,7 @@ function NewsCarousel({ announcements }) {
   return (
     <div className="overflow-hidden py-2">
       <div className="overflow-hidden">
-        <span className="news-scroll text-sm font-bold text-white">{text}</span>
+        <span className="news-scroll">{text}</span>
       </div>
     </div>
   )
