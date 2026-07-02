@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
+import { REFERRAL_PURCHASE_BONUS, REFERRAL_PURCHASE_THRESHOLD } from '../lib/constants'
 
 const TABS = ['Overview', 'Payments', 'Withdrawals', 'Users']
 
@@ -368,16 +369,51 @@ export default function AdminPage() {
     setActionLoading(key)
     try {
       const { data: tokenRow } = await supabase.from('user_tokens').select('*').eq('user_id', tx.user_id).single()
+
+      // Credit tokens to the buyer
       await Promise.all([
         supabase.from('transactions').update({ status: 'completed', amount }).eq('id', tx.id),
         supabase.from('user_tokens').upsert({
-          user_id: tx.user_id,
+          user_id:         tx.user_id,
           total_purchased: (tokenRow?.total_purchased || 0) + amount,
           total_earned:    (tokenRow?.total_earned    || 0) + amount,
           balance:         (tokenRow?.balance         || 0) + amount,
           total_withdrawn: tokenRow?.total_withdrawn || 0,
         }, { onConflict: 'user_id' }),
       ])
+
+      // If purchase ≥ threshold, credit referral bonus to whoever referred this user
+      if (amount >= REFERRAL_PURCHASE_THRESHOLD) {
+        const { data: buyerProfile } = await supabase
+          .from('profiles').select('referred_by').eq('user_id', tx.user_id).single()
+
+        if (buyerProfile?.referred_by) {
+          const { data: referrerProfile } = await supabase
+            .from('profiles').select('user_id').eq('referral_code', buyerProfile.referred_by).single()
+
+          if (referrerProfile) {
+            const { data: refTokens } = await supabase
+              .from('user_tokens').select('*').eq('user_id', referrerProfile.user_id).single()
+
+            await supabase.from('user_tokens').upsert({
+              user_id:         referrerProfile.user_id,
+              balance:         (refTokens?.balance          || 0) + REFERRAL_PURCHASE_BONUS,
+              total_earned:    (refTokens?.total_earned     || 0) + REFERRAL_PURCHASE_BONUS,
+              referral_tokens: (refTokens?.referral_tokens  || 0) + REFERRAL_PURCHASE_BONUS,
+              total_purchased: refTokens?.total_purchased || 0,
+              total_withdrawn: refTokens?.total_withdrawn || 0,
+            }, { onConflict: 'user_id' })
+
+            await supabase.from('transactions').insert({
+              user_id: referrerProfile.user_id,
+              type:    'referral_purchase',
+              amount:  REFERRAL_PURCHASE_BONUS,
+              status:  'completed',
+            })
+          }
+        }
+      }
+
       load()
     } finally { setActionLoading(null) }
   }

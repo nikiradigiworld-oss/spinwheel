@@ -42,4 +42,6 @@ export const SPIN_SEGMENTS = [
 
 export const MIN_WITHDRAW_TOKENS = 200
 export const TDS_PERCENT = 1
-export const REFERRAL_BONUS = 10
+export const REFERRAL_BONUS = 10             // on signup
+export const REFERRAL_PURCHASE_BONUS = 10    // when referred friend buys ≥100 tokens
+export const REFERRAL_PURCHASE_THRESHOLD = 100
