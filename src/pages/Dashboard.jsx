@@ -351,37 +351,19 @@ export default function Dashboard() {
           <p className="text-xs text-gray-400">{user?.email}</p>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-3">
-          {[
-            { label: 'Purchased',  icon: '🛒', value: tokens?.total_purchased ?? 0,  color: 'from-indigo-600 to-indigo-800' },
-            { label: 'Earned',     icon: '🎡', value: tokens?.total_earned ?? 0,     color: 'from-purple-600 to-purple-800' },
-            { label: 'Reference',  icon: '🤝', value: tokens?.referral_tokens ?? 0,  color: 'from-pink-600 to-pink-800'    },
-            { label: 'Available',  icon: '💎', value: tokens?.balance ?? 0,          color: 'from-green-600 to-green-800'  },
-            { label: 'Withdrawn',  icon: '💸', value: tokens?.total_withdrawn ?? 0,  color: 'from-orange-600 to-orange-800'},
-          ].map(({ label, icon, value, color }) => (
-            <div key={label} className={`bg-gradient-to-br ${color} rounded-2xl p-4`}>
-              <div className="flex items-center gap-1.5 mb-1">
-                <span className="text-sm">{icon}</span>
-                <p className="text-xs text-white/70 font-medium">{label}</p>
-              </div>
-              <p className="text-2xl font-bold">{value}</p>
-              <p className="text-xs text-white/40">tokens</p>
+        {/* Spins counter */}
+        <div className="bg-gradient-to-br from-sky-600 to-sky-800 rounded-2xl p-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-lg">⚡</span>
+            <div>
+              <p className="text-xs text-white/70 font-medium">Spins Left Today</p>
+              <p className="text-2xl font-bold">{spinsLeft} <span className="text-sm font-normal text-white/50">/ {MAX_DAILY_SPINS}</span></p>
             </div>
-          ))}
-          <div className="bg-gradient-to-br from-sky-600 to-sky-800 rounded-2xl p-4 col-span-2 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-lg">⚡</span>
-              <div>
-                <p className="text-xs text-white/70 font-medium">Spins Left Today</p>
-                <p className="text-2xl font-bold">{spinsLeft} <span className="text-sm font-normal text-white/50">/ {MAX_DAILY_SPINS}</span></p>
-              </div>
-            </div>
-            <div className="flex gap-1.5">
-              {Array.from({ length: MAX_DAILY_SPINS }).map((_, i) => (
-                <div key={i} className={`w-3 h-3 rounded-full ${i < spinsUsedToday ? 'bg-white/30' : 'bg-white'}`} />
-              ))}
-            </div>
+          </div>
+          <div className="flex gap-1.5 flex-wrap justify-end max-w-[140px]">
+            {Array.from({ length: MAX_DAILY_SPINS }).map((_, i) => (
+              <div key={i} className={`w-3 h-3 rounded-full ${i < spinsUsedToday ? 'bg-white/30' : 'bg-white'}`} />
+            ))}
           </div>
         </div>
 
