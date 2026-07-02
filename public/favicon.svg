@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </radialGradient>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="50" fill="url(#bg)"/>
+  <!-- Wheel segments -->
+  <path d="M50 50 L50 10 A40 40 0 0 1 84.6 30 Z" fill="#a855f7" opacity="0.9"/>
+  <path d="M50 50 L84.6 30 A40 40 0 0 1 84.6 70 Z" fill="#6366f1" opacity="0.9"/>
+  <path d="M50 50 L84.6 70 A40 40 0 0 1 50 90 Z" fill="#8b5cf6" opacity="0.9"/>
+  <path d="M50 50 L50 90 A40 40 0 0 1 15.4 70 Z" fill="#4f46e5" opacity="0.9"/>
+  <path d="M50 50 L15.4 70 A40 40 0 0 1 15.4 30 Z" fill="#7c3aed" opacity="0.9"/>
+  <path d="M50 50 L15.4 30 A40 40 0 0 1 50 10 Z" fill="#6d28d9" opacity="0.9"/>
+  <!-- Divider lines -->
+  <line x1="50" y1="50" x2="50" y2="10"    stroke="#0d0825" stroke-width="2"/>
+  <line x1="50" y1="50" x2="84.6" y2="30"  stroke="#0d0825" stroke-width="2"/>
+  <line x1="50" y1="50" x2="84.6" y2="70"  stroke="#0d0825" stroke-width="2"/>
+  <line x1="50" y1="50" x2="50" y2="90"    stroke="#0d0825" stroke-width="2"/>
+  <line x1="50" y1="50" x2="15.4" y2="70"  stroke="#0d0825" stroke-width="2"/>
+  <line x1="50" y1="50" x2="15.4" y2="30"  stroke="#0d0825" stroke-width="2"/>
+  <!-- Center circle -->
+  <circle cx="50" cy="50" r="12" fill="#0d0825" stroke="#a855f7" stroke-width="2"/>
+  <text x="50" y="54" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="sans-serif">S</text>
+</svg>
