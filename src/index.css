@@ -118,18 +118,13 @@
   animation: gradient-shift 4s linear infinite;
 }
 
-/* News ticker */
-@keyframes ticker {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+/* News fade */
+@keyframes news-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-.ticker-track {
-  display: flex;
-  width: max-content;
-  animation: ticker 22s linear infinite;
-}
-.ticker-track:hover {
-  animation-play-state: paused;
+.news-fade {
+  animation: news-fade-in 0.5s ease forwards;
 }
 
 /* Glass card style */

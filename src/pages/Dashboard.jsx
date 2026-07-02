@@ -205,6 +205,43 @@ function CelebrationOverlay({ result, avatarSrc, displayName, onDismiss }) {
   )
 }
 
+function NewsCarousel({ announcements }) {
+  const [idx, setIdx] = useState(0)
+  const [key, setKey] = useState(0)
+
+  useEffect(() => {
+    if (announcements.length <= 1) return
+    const id = setInterval(() => {
+      setIdx(i => (i + 1) % announcements.length)
+      setKey(k => k + 1)
+    }, 4000)
+    return () => clearInterval(id)
+  }, [announcements.length])
+
+  const a = announcements[idx]
+
+  return (
+    <div className="bg-gray-900 border border-yellow-500/30 rounded-2xl overflow-hidden">
+      <div className="flex items-center gap-2 bg-yellow-500/10 border-b border-yellow-500/20 px-4 py-2">
+        <span className="text-yellow-400 text-base">📢</span>
+        <span className="text-yellow-300 text-xs font-black uppercase tracking-widest">Daily News</span>
+        {announcements.length > 1 && (
+          <div className="ml-auto flex gap-1">
+            {announcements.map((_, i) => (
+              <button key={i} onClick={() => { setIdx(i); setKey(k => k + 1) }}
+                className={`w-1.5 h-1.5 rounded-full transition-all ${i === idx ? 'bg-yellow-400 w-3' : 'bg-gray-600'}`} />
+            ))}
+          </div>
+        )}
+      </div>
+      <div key={key} className="news-fade px-4 py-3">
+        <p className="text-sm font-bold text-white">{a.title}</p>
+        {a.message && <p className="text-xs text-gray-400 mt-0.5 leading-relaxed">{a.message}</p>}
+      </div>
+    </div>
+  )
+}
+
 export default function Dashboard() {
   const { user } = useAuth()
   const { tokens, loading, refetch } = useTokens()
@@ -356,27 +393,9 @@ export default function Dashboard() {
           <p className="text-xs text-gray-400">{user?.email}</p>
         </div>
 
-        {/* News ticker */}
+        {/* News carousel */}
         {announcements.length > 0 && (
-          <div className="flex items-center rounded-2xl border border-yellow-500/30 bg-gray-900 overflow-hidden h-11">
-            <div className="shrink-0 flex items-center gap-1.5 px-3 h-full bg-yellow-500 rounded-l-2xl">
-              <span className="text-black text-sm">📢</span>
-              <span className="text-black text-xs font-black uppercase tracking-wide whitespace-nowrap">News</span>
-            </div>
-            <div className="overflow-hidden flex-1 h-full flex items-center">
-              <div className="ticker-track">
-                {[...announcements, ...announcements].map((a, i) => (
-                  <span key={i} className="flex items-center text-sm font-bold text-white whitespace-nowrap">
-                    <span className="text-yellow-400 mx-4">★</span>
-                    {a.title}
-                    {a.message && (
-                      <span className="font-normal text-gray-300"> — {a.message}</span>
-                    )}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
+          <NewsCarousel announcements={announcements} />
         )}
 
         {/* Spin window status banner */}
