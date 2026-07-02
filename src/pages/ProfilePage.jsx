@@ -47,8 +47,8 @@ export default function ProfilePage() {
     : ''
 
   const copyReferral = async () => {
-    if (!referralLink) return
-    await navigator.clipboard.writeText(referralLink)
+    if (!profile?.referral_code) return
+    await navigator.clipboard.writeText(profile.referral_code)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -287,22 +287,15 @@ export default function ProfilePage() {
         </div>
 
         <div className="space-y-2">
-          <p className="text-xs text-gray-400">
-            Share your link — you earn <span className="text-pink-300 font-semibold">{REFERRAL_BONUS} tokens</span> for every friend who joins!
+          <p className="text-xs text-gray-400 text-center">
+            Share your code — earn <span className="text-pink-300 font-semibold">{REFERRAL_BONUS} tokens</span> per friend who joins!
           </p>
-          <div className="flex gap-2">
-            <input
-              readOnly
-              value={referralLink}
-              className="flex-1 bg-gray-800 border border-gray-700 rounded-xl px-3 py-2 text-xs text-gray-300 font-mono truncate"
-            />
-            <button
-              onClick={copyReferral}
-              className="px-3 py-2 bg-pink-700 hover:bg-pink-600 rounded-xl text-xs font-semibold transition-colors whitespace-nowrap"
-            >
-              {copied ? '✅ Copied!' : '📋 Copy'}
-            </button>
-          </div>
+          <button
+            onClick={copyReferral}
+            className="w-full px-3 py-2 bg-pink-700 hover:bg-pink-600 rounded-xl text-sm font-semibold transition-colors"
+          >
+            {copied ? '✅ Code Copied!' : '📋 Copy Referral Code'}
+          </button>
         </div>
       </div>
 
