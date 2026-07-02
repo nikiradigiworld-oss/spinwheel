@@ -263,21 +263,19 @@ function UsersTab() {
 
   return (
     <div className="space-y-3">
-      <div className="flex gap-2">
-        <input
-          type="text"
-          placeholder="Search name or user ID…"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
-        />
-        <button
-          onClick={downloadExcel}
-          className="flex items-center gap-2 px-4 py-2.5 bg-green-700 hover:bg-green-600 rounded-xl text-sm font-semibold transition-colors whitespace-nowrap"
-        >
-          📥 Download Excel
-        </button>
-      </div>
+      <button
+        onClick={downloadExcel}
+        style={{ background: 'linear-gradient(135deg,#16a34a,#15803d)', width: '100%', padding: '12px', borderRadius: '12px', fontSize: '14px', fontWeight: '700', color: '#fff', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+      >
+        📥 Download All Users (Excel)
+      </button>
+      <input
+        type="text"
+        placeholder="Search name or user ID…"
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
+      />
       <p className="text-xs text-gray-500">{filtered.length} user{filtered.length !== 1 ? 's' : ''}</p>
 
       <div className="space-y-3">
