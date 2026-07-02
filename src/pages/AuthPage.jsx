@@ -125,16 +125,26 @@ export default function AuthPage() {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
+              className="text-center"
             >
-              <h2 className="shimmer-text text-2xl font-black tracking-wide uppercase">
+              <h2
+                className="text-2xl font-black tracking-wide uppercase"
+                style={{
+                  background: 'linear-gradient(135deg, #f472b6, #e879f9, #c084fc)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                }}
+              >
                 Spin to Earn
               </h2>
               <motion.p
-                className="text-xs text-white/40 tracking-[0.25em] uppercase mt-1"
-                animate={{ opacity: [0.4, 0.9, 0.4] }}
+                className="text-xs tracking-[0.25em] uppercase mt-1"
+                style={{ color: '#f472b6' }}
+                animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 2.5, repeat: Infinity }}
               >
-                Spin · Win · Withdraw
+                Spin &nbsp;·&nbsp; Win &nbsp;·&nbsp; Withdraw
               </motion.p>
             </motion.div>
           </motion.div>
