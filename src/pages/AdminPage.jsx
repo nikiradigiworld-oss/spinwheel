@@ -228,6 +228,33 @@ function UsersTab() {
     u.user_id?.toLowerCase().includes(search.toLowerCase())
   )
 
+  const downloadExcel = () => {
+    const rows = [
+      ['Name', 'Country', 'Gender', 'DOB', 'Referral Code', 'Balance', 'Total Earned', 'Total Purchased', 'Total Withdrawn', 'Referral Tokens', 'Joined'],
+      ...users.map(u => [
+        u.full_name || '',
+        u.country   || '',
+        u.gender    || '',
+        u.dob       || '',
+        u.referral_code || '',
+        u.tokens?.balance          || 0,
+        u.tokens?.total_earned     || 0,
+        u.tokens?.total_purchased  || 0,
+        u.tokens?.total_withdrawn  || 0,
+        u.tokens?.referral_tokens  || 0,
+        u.created_at ? new Date(u.created_at).toLocaleDateString() : '',
+      ])
+    ]
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url  = URL.createObjectURL(blob)
+    const a    = document.createElement('a')
+    a.href     = url
+    a.download = `spinwheel-users-${new Date().toISOString().slice(0,10)}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   if (loading) return (
     <div className="flex justify-center py-10">
       <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
@@ -236,13 +263,21 @@ function UsersTab() {
 
   return (
     <div className="space-y-3">
-      <input
-        type="text"
-        placeholder="Search name or user ID…"
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-        className="w-full bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
-      />
+      <div className="flex gap-2">
+        <input
+          type="text"
+          placeholder="Search name or user ID…"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="flex-1 bg-gray-900 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-purple-500"
+        />
+        <button
+          onClick={downloadExcel}
+          className="flex items-center gap-2 px-4 py-2.5 bg-green-700 hover:bg-green-600 rounded-xl text-sm font-semibold transition-colors whitespace-nowrap"
+        >
+          📥 Download Excel
+        </button>
+      </div>
       <p className="text-xs text-gray-500">{filtered.length} user{filtered.length !== 1 ? 's' : ''}</p>
 
       <div className="space-y-3">
