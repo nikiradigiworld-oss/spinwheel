@@ -5,7 +5,7 @@ export const WALLETS = {
 
 export const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'admin@saminfinity.com'
 
-export const SPIN_ENTRY_FEE = 25
+export const SPIN_PACKAGE_PRICE = 50  // pay once per day to unlock 10 spins
 export const MAX_ZEROS_PER_DAY = 2
 
 // 25 spin segments: 10 big wins (15-30), 12 medium wins (1-12), 3 zeros

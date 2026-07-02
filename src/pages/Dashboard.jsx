@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { useTokens } from '../hooks/useTokens'
 import { useProfile } from '../hooks/useProfile'
 import { supabase } from '../lib/supabase'
-import { SPIN_SEGMENTS, SPIN_ENTRY_FEE, MAX_ZEROS_PER_DAY } from '../lib/constants'
+import { SPIN_SEGMENTS, SPIN_PACKAGE_PRICE, MAX_ZEROS_PER_DAY } from '../lib/constants'
 import { getSpinWindowStatus, formatCountdown, MAX_DAILY_SPINS } from '../lib/spintime'
 import Avatar from '../components/Avatar'
 
@@ -226,13 +226,50 @@ export default function Dashboard() {
 
   const today = new Date().toISOString().split('T')[0]
   const isToday = tokens?.last_spin_date === today
+  const hasPurchasedPackage = tokens?.spin_package_date === today
   const spinsUsedToday = isToday ? (tokens?.spins_today ?? 0) : 0
   const zerosToday = isToday ? (tokens?.zeros_today ?? 0) : 0
-  const spinsLeft = MAX_DAILY_SPINS - spinsUsedToday
-  const hasEnoughBalance = (tokens?.balance ?? 0) >= SPIN_ENTRY_FEE
-  const canSpin = spinsLeft > 0 && windowStatus.isOpen && hasEnoughBalance
+  const spinsLeft = hasPurchasedPackage ? MAX_DAILY_SPINS - spinsUsedToday : 0
+  const canSpin = hasPurchasedPackage && spinsLeft > 0 && windowStatus.isOpen
 
   const displayName = profile?.full_name || user?.user_metadata?.full_name || 'User'
+
+  const [buying, setBuying] = useState(false)
+
+  const handleBuyPackage = async () => {
+    if (buying || hasPurchasedPackage) return
+    if ((tokens?.balance ?? 0) < SPIN_PACKAGE_PRICE) {
+      setError(`You need ${SPIN_PACKAGE_PRICE} tokens to buy today's spin package`)
+      return
+    }
+    setBuying(true)
+    setError('')
+    try {
+      await supabase.from('user_tokens').upsert({
+        user_id: user.id,
+        spin_package_date: today,
+        spins_today: 0,
+        zeros_today: 0,
+        last_spin_date: tokens?.last_spin_date || null,
+        balance: (tokens?.balance || 0) - SPIN_PACKAGE_PRICE,
+        total_earned: tokens?.total_earned || 0,
+        total_purchased: tokens?.total_purchased || 0,
+        total_withdrawn: tokens?.total_withdrawn || 0,
+      }, { onConflict: 'user_id' })
+
+      await supabase.from('transactions').insert({
+        user_id: user.id,
+        type: 'spin_package',
+        amount: -SPIN_PACKAGE_PRICE,
+        status: 'completed',
+      })
+      refetch()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setBuying(false)
+    }
+  }
 
   const handleSpin = async () => {
     if (!canSpin || spinning) return
@@ -258,23 +295,25 @@ export default function Dashboard() {
       try {
         const newSpinsToday = spinsUsedToday + 1
         const newZerosToday = chosen.value === 0 ? zerosToday + 1 : zerosToday
-        const netBalance = (tokens?.balance || 0) - SPIN_ENTRY_FEE + chosen.value
         await supabase.from('user_tokens').upsert({
           user_id: user.id,
           last_spin_date: today,
           spins_today: newSpinsToday,
           zeros_today: newZerosToday,
+          spin_package_date: today,
           total_earned: (tokens?.total_earned || 0) + chosen.value,
-          balance: netBalance,
+          balance: (tokens?.balance || 0) + chosen.value,
           total_withdrawn: tokens?.total_withdrawn || 0,
         }, { onConflict: 'user_id' })
 
-        await supabase.from('transactions').insert({
-          user_id: user.id,
-          type: chosen.value > 0 ? 'spin_win' : 'spin_loss',
-          amount: chosen.value - SPIN_ENTRY_FEE,
-          status: 'completed',
-        })
+        if (chosen.value > 0) {
+          await supabase.from('transactions').insert({
+            user_id: user.id,
+            type: 'spin_win',
+            amount: chosen.value,
+            status: 'completed',
+          })
+        }
         refetch()
       } catch (err) {
         setError(err.message)
@@ -351,7 +390,7 @@ export default function Dashboard() {
           <div className="flex items-center gap-3 w-full justify-between">
             <h2 className="font-semibold text-lg">Spin the Wheel</h2>
             <div className="flex items-center gap-1.5 bg-yellow-900/40 border border-yellow-600/40 rounded-full px-3 py-1">
-              <span className="text-yellow-400 text-xs font-bold">🎟 Entry: {SPIN_ENTRY_FEE} tokens</span>
+              <span className="text-yellow-400 text-xs font-bold">🎟 {SPIN_PACKAGE_PRICE} tokens = 10 spins</span>
             </div>
           </div>
 
@@ -359,29 +398,46 @@ export default function Dashboard() {
             <Countdown status={windowStatus} />
           </div>
 
-          <SpinWheel spinning={spinning} spinDegrees={spinDegrees} resultIndex={resultIndex} />
+          {!hasPurchasedPackage ? (
+            <div className="w-full flex flex-col items-center gap-3 py-4">
+              <div className="text-center space-y-1">
+                <p className="text-4xl">🎟️</p>
+                <p className="text-white font-bold text-base">Buy Today's Spin Package</p>
+                <p className="text-gray-400 text-sm">Pay <span className="text-yellow-400 font-bold">{SPIN_PACKAGE_PRICE} tokens</span> to unlock <span className="text-purple-400 font-bold">10 spins</span> for today</p>
+              </div>
+              {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+              <button onClick={handleBuyPackage} disabled={buying || (tokens?.balance ?? 0) < SPIN_PACKAGE_PRICE}
+                className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-400 hover:to-orange-400 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl py-3 font-bold text-lg transition-all text-white">
+                {buying ? 'Processing...'
+                  : (tokens?.balance ?? 0) < SPIN_PACKAGE_PRICE
+                  ? `Need ${SPIN_PACKAGE_PRICE} Tokens`
+                  : `Buy 10 Spins for ${SPIN_PACKAGE_PRICE} Tokens 🎟️`}
+              </button>
+            </div>
+          ) : (
+            <>
+              <SpinWheel spinning={spinning} spinDegrees={spinDegrees} resultIndex={resultIndex} />
 
-          {result && !spinning && (
-            <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-              className={`text-center py-2 px-6 rounded-full font-bold text-lg ${
-                result.value > 0 ? 'bg-green-900 text-green-300' : 'bg-red-900/50 text-red-300'
-              }`}>
-              {result.value > 0
-                ? `🎉 +${result.value} tokens won!`
-                : `😔 No win — lost ${SPIN_ENTRY_FEE} tokens`}
-            </motion.div>
+              {result && !spinning && (
+                <motion.div initial={{ scale: 0.5, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+                  className={`text-center py-2 px-6 rounded-full font-bold text-lg ${
+                    result.value > 0 ? 'bg-green-900 text-green-300' : 'bg-red-900/50 text-red-300'
+                  }`}>
+                  {result.value > 0 ? `🎉 +${result.value} Tokens Won!` : '😔 No Win! Try Again'}
+                </motion.div>
+              )}
+
+              {error && <p className="text-red-400 text-sm">{error}</p>}
+
+              <button onClick={handleSpin} disabled={!canSpin || spinning}
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl py-3 font-bold text-lg transition-all">
+                {spinning ? 'Spinning...'
+                  : !windowStatus.isOpen ? 'Window Closed ⏰'
+                  : spinsLeft === 0 ? 'All 10 Spins Used Today 🎉'
+                  : `SPIN NOW 🎡 (${spinsLeft} left)`}
+              </button>
+            </>
           )}
-
-          {error && <p className="text-red-400 text-sm">{error}</p>}
-
-          <button onClick={handleSpin} disabled={!canSpin || spinning}
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-xl py-3 font-bold text-lg transition-all">
-            {spinning ? 'Spinning...'
-              : !windowStatus.isOpen ? 'Window Closed ⏰'
-              : spinsLeft === 0 ? 'No Spins Left Today'
-              : !hasEnoughBalance ? `Need ${SPIN_ENTRY_FEE} Tokens to Spin`
-              : `SPIN NOW 🎡 (−${SPIN_ENTRY_FEE})`}
-          </button>
         </div>
       </div>
     </>
