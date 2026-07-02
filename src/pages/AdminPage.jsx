@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import { REFERRAL_PURCHASE_BONUS, REFERRAL_PURCHASE_THRESHOLD } from '../lib/constants'
 
-const TABS = ['Overview', 'Payments', 'Withdrawals', 'Users']
+const TABS = ['Overview', 'Payments', 'Withdrawals', 'Users', 'News']
 
 // ─── small reusable pieces ────────────────────────────────────────────────────
 
@@ -339,6 +339,102 @@ function UsersTab() {
   )
 }
 
+// ─── News / Announcements ─────────────────────────────────────────────────────
+
+function NewsTab() {
+  const [title, setTitle]   = useState('')
+  const [message, setMessage] = useState('')
+  const [posting, setPosting] = useState(false)
+  const [items, setItems]   = useState([])
+  const [msg, setMsg]       = useState('')
+
+  const load = useCallback(async () => {
+    const { data } = await supabase.from('announcements').select('*')
+      .order('created_at', { ascending: false })
+    setItems(data || [])
+  }, [])
+
+  useEffect(() => { load() }, [load])
+
+  const post = async (e) => {
+    e.preventDefault()
+    if (!title.trim()) return
+    setPosting(true)
+    await supabase.from('announcements').insert({ title: title.trim(), message: message.trim() || null, active: true })
+    setTitle('')
+    setMessage('')
+    setMsg('Posted!')
+    setTimeout(() => setMsg(''), 2500)
+    await load()
+    setPosting(false)
+  }
+
+  const toggle = async (item) => {
+    await supabase.from('announcements').update({ active: !item.active }).eq('id', item.id)
+    load()
+  }
+
+  const remove = async (id) => {
+    await supabase.from('announcements').delete().eq('id', id)
+    load()
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Post form */}
+      <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4 space-y-3">
+        <p className="text-sm font-semibold text-blue-300">📢 Post Daily News</p>
+        <form onSubmit={post} className="space-y-3">
+          <input
+            type="text" value={title} onChange={e => setTitle(e.target.value)}
+            placeholder="Headline / Title *"
+            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
+          />
+          <textarea
+            value={message} onChange={e => setMessage(e.target.value)}
+            placeholder="Message / Details (optional)"
+            rows={3}
+            className="w-full bg-gray-800 border border-gray-700 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 resize-none"
+          />
+          {msg && <p className="text-xs text-green-400">{msg}</p>}
+          <button type="submit" disabled={posting || !title.trim()}
+            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-40 rounded-xl py-2.5 text-sm font-bold transition-all">
+            {posting ? 'Posting…' : 'Post Announcement'}
+          </button>
+        </form>
+      </div>
+
+      {/* Existing items */}
+      <Section title={`All Announcements (${items.length})`}>
+        {items.length === 0
+          ? <p className="text-gray-500 text-sm p-4">No announcements yet.</p>
+          : items.map(a => (
+            <div key={a.id} className="p-4 space-y-1">
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-semibold ${a.active ? 'text-white' : 'text-gray-500 line-through'}`}>{a.title}</p>
+                  {a.message && <p className="text-xs text-gray-400 mt-0.5">{a.message}</p>}
+                  <p className="text-xs text-gray-600 mt-1">{new Date(a.created_at).toLocaleString('en-IN')}</p>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  <button onClick={() => toggle(a)}
+                    className={`text-xs px-2 py-1 rounded-lg border transition-colors ${a.active ? 'border-green-500/40 text-green-400 hover:bg-green-900/20' : 'border-gray-600 text-gray-500 hover:bg-gray-800'}`}>
+                    {a.active ? 'Live' : 'Hidden'}
+                  </button>
+                  <button onClick={() => remove(a.id)}
+                    className="text-xs px-2 py-1 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-900/20 transition-colors">
+                    ✕
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        }
+      </Section>
+    </div>
+  )
+}
+
 // ─── Main AdminPage ───────────────────────────────────────────────────────────
 
 export default function AdminPage() {
@@ -502,6 +598,7 @@ export default function AdminPage() {
           {activeTab === 'Payments'    && <PaymentsTab payments={payments} onApprove={approvePayment} onReject={rejectPayment} actionLoading={actionLoading} />}
           {activeTab === 'Withdrawals' && <WithdrawalsTab withdrawals={withdrawals} onMarkPaid={markWithdrawalPaid} actionLoading={actionLoading} />}
           {activeTab === 'Users'       && <UsersTab />}
+          {activeTab === 'News'        && <NewsTab />}
         </div>
 
       </div>
