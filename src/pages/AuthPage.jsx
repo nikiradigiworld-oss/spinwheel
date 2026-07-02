@@ -91,99 +91,20 @@ export default function AuthPage() {
       <div className="absolute w-72 h-72 rounded-full pointer-events-none"
         style={{ background: 'radial-gradient(circle, rgba(234,179,8,0.1) 0%, transparent 70%)', top: '40%', left: '40%', filter: 'blur(50px)' }} />
 
-      {/* ── Main layout: side-by-side ── */}
-      <div className="w-full max-w-5xl z-10 flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12">
-
-        {/* ── LEFT: Title + Hero image ── */}
-        <motion.div
-          initial={{ opacity: 0, x: -60, scale: 0.9 }}
-          animate={{ opacity: 1,  x: 0,   scale: 1   }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          className="flex-1 flex flex-col items-center justify-center relative"
-        >
-          {/* ── App name & tagline above hero image ── */}
-          <div className="text-center mb-6 z-10 relative">
-
-            {/* Title with shimmer glow animation */}
-            <div className="relative inline-block">
-              <h1 className="shimmer-text text-4xl md:text-5xl font-extrabold tracking-tight leading-tight relative z-10">
-                Spin &amp; SIP Money
-              </h1>
-              {/* Glow behind title */}
-              <motion.div
-                className="absolute inset-0 blur-2xl -z-10"
-                style={{ background: 'linear-gradient(135deg, #ec4899, #a855f7)' }}
-                animate={{ opacity: [0.3, 0.7, 0.3] }}
-                transition={{ duration: 2.5, repeat: Infinity }}
-              />
-            </div>
-
-            {/* Spin · Win · Earn — each word pops individually */}
-            <div className="flex items-center justify-center gap-1 mt-3">
-              {[
-                { word: 'Spin', color: '#f472b6' },
-                { word: 'Win',  color: '#e879f9' },
-                { word: 'Earn', color: '#c084fc' },
-              ].map(({ word, color }, i) => (
-                <div key={word} className="flex items-center gap-1">
-                  <motion.span
-                    className="text-lg font-black tracking-[0.2em] uppercase"
-                    style={{ color }}
-                    animate={{ scale: [1, 1.25, 1], y: [0, -6, 0], opacity: [0.7, 1, 0.7] }}
-                    transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.5, ease: 'easeInOut' }}
-                  >
-                    {word}
-                  </motion.span>
-                  {i < 2 && (
-                    <motion.span
-                      className="text-white/30 font-bold text-lg mx-1"
-                      animate={{ opacity: [0.2, 0.8, 0.2] }}
-                      transition={{ duration: 1.6, repeat: Infinity, delay: i * 0.5 }}
-                    >·</motion.span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Stats below title */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="mt-6 text-center"
-          >
-            <p className="text-white/40 text-sm mb-4 tracking-wide">Join thousands of earners</p>
-            <div className="flex items-center justify-center gap-6">
-              {[['💰', '10K+', 'Members'], ['🎯', '₹50L+', 'Paid Out'], ['⭐', '4.9', 'Rating']].map(([icon, val, label], i) => (
-                <motion.div key={i}
-                  animate={{ scale: [1, 1.06, 1] }}
-                  transition={{ duration: 2.2, delay: i * 0.35, repeat: Infinity }}
-                  className="text-center px-3 py-2 rounded-2xl"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
-                >
-                  <div className="text-xl">{icon}</div>
-                  <div className="text-white font-bold text-sm mt-0.5">{val}</div>
-                  <div className="text-white/30 text-xs">{label}</div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </motion.div>
-
-        {/* ── RIGHT: Logo outside + mirror glass card ── */}
-        <div className="w-full max-w-sm flex flex-col items-center gap-5"
+      {/* ── Centered layout ── */}
+      <div className="w-full max-w-sm z-10 flex flex-col items-center gap-5"
           onMouseMove={onMouseMove}
           onMouseLeave={onMouseLeave}
         >
-          {/* ── Spinning logo above form ── */}
+          {/* ── Logo + Title block ── */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className="flex flex-col items-center"
+            className="flex flex-col items-center text-center gap-2"
           >
-            <div className="relative inline-flex items-center justify-center mb-2">
+            {/* Spinning wheel logo */}
+            <div className="relative inline-flex items-center justify-center mb-1">
               <motion.div
                 animate={{ rotateY: 360 }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
@@ -198,6 +119,24 @@ export default function AuthPage() {
                 transition={{ duration: 2, repeat: Infinity }}
               />
             </div>
+
+            {/* Spin to Earn title */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              <h2 className="shimmer-text text-2xl font-black tracking-wide uppercase">
+                Spin to Earn
+              </h2>
+              <motion.p
+                className="text-xs text-white/40 tracking-[0.25em] uppercase mt-1"
+                animate={{ opacity: [0.4, 0.9, 0.4] }}
+                transition={{ duration: 2.5, repeat: Infinity }}
+              >
+                Spin · Win · Withdraw
+              </motion.p>
+            </motion.div>
           </motion.div>
 
           {/* ── Mirror glass card — form only inside ── */}
@@ -323,7 +262,6 @@ export default function AuthPage() {
           >
             SAM Infinity Resources © 2025
           </motion.p>
-        </div>
       </div>
     </div>
   )
