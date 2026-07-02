@@ -302,8 +302,8 @@ export default function ProfilePage() {
                 <span className="text-sm">💳</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-white font-medium">Friend purchases {REFERRAL_PURCHASE_THRESHOLD}+ tokens</p>
-                <p className="text-xs text-gray-400">Bonus credited to you</p>
+                <p className="text-xs text-white font-medium">Friend purchases {REFERRAL_PURCHASE_THRESHOLD} tokens</p>
+                <p className="text-xs text-gray-400">Bonus credited to you <span className="text-yellow-400 font-semibold">{REFERRAL_PURCHASE_BONUS} tokens</span></p>
               </div>
               <p className="text-base font-black text-yellow-400 shrink-0">+{REFERRAL_PURCHASE_BONUS} 🪙</p>
             </div>
