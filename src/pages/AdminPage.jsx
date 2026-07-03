@@ -133,31 +133,67 @@ function PaymentsTab({ payments, onApprove, onReject, actionLoading }) {
 
 // ─── Withdrawals ──────────────────────────────────────────────────────────────
 
+function WithdrawalRow({ tx, onMarkPaid, actionLoading }) {
+  const [file, setFile] = useState(null)
+  const [preview, setPreview] = useState(null)
+
+  const handleFile = (e) => {
+    const f = e.target.files[0]
+    if (!f) return
+    setFile(f)
+    setPreview(URL.createObjectURL(f))
+  }
+
+  return (
+    <div className="p-4 space-y-3">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-white">{tx.user_id.slice(0, 8)}…</p>
+          <p className="text-xs text-gray-400">{tx.wallet_type}: <span className="font-mono text-gray-300 break-all">{tx.wallet_address}</span></p>
+          <p className="text-xs text-gray-500">{new Date(tx.created_at).toLocaleString('en-IN')}</p>
+        </div>
+        <div className="text-right shrink-0">
+          <p className="font-bold text-orange-400">{tx.amount} tokens</p>
+        </div>
+      </div>
+
+      {/* Payment proof upload */}
+      <label className={`flex items-center gap-3 border-2 border-dashed rounded-xl p-3 cursor-pointer transition-colors ${preview ? 'border-green-500/50' : 'border-gray-700 hover:border-gray-500'}`}>
+        {preview ? (
+          <img src={preview} alt="proof" className="w-16 h-16 rounded-lg object-cover shrink-0" />
+        ) : (
+          <div className="w-16 h-16 rounded-lg bg-gray-800 flex items-center justify-center shrink-0 text-2xl">📸</div>
+        )}
+        <div>
+          <p className="text-xs text-white font-medium">{preview ? 'Payment proof selected' : 'Upload payment screenshot'}</p>
+          <p className="text-xs text-gray-500 mt-0.5">Optional — tap to choose image</p>
+        </div>
+        <input type="file" accept="image/*" onChange={handleFile} className="hidden" />
+      </label>
+
+      <button
+        onClick={() => onMarkPaid(tx.id, file)}
+        disabled={actionLoading === `paid-${tx.id}`}
+        className="w-full bg-green-700 hover:bg-green-600 disabled:opacity-50 text-white text-sm py-2 rounded-xl transition-colors"
+      >
+        {actionLoading === `paid-${tx.id}` ? 'Processing…' : 'Mark as Paid ✅'}
+      </button>
+    </div>
+  )
+}
+
 function WithdrawalsTab({ withdrawals, onMarkPaid, actionLoading }) {
   return (
     <Section title={`Pending Withdrawals (${withdrawals.length})`}>
       {withdrawals.length === 0
         ? <p className="text-gray-500 text-sm p-4">No pending withdrawals.</p>
         : withdrawals.map(tx => (
-          <div key={tx.id} className="p-4 space-y-2">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-white">{tx.user_id.slice(0, 8)}…</p>
-                <p className="text-xs text-gray-400">{tx.wallet_type}: <span className="font-mono text-gray-300 break-all">{tx.wallet_address}</span></p>
-                <p className="text-xs text-gray-500">{new Date(tx.created_at).toLocaleString('en-IN')}</p>
-              </div>
-              <div className="text-right shrink-0">
-                <p className="font-bold text-orange-400">{tx.amount} tokens</p>
-              </div>
-            </div>
-            <button
-              onClick={() => onMarkPaid(tx.id)}
-              disabled={actionLoading === `paid-${tx.id}`}
-              className="w-full bg-green-700 hover:bg-green-600 disabled:opacity-50 text-white text-sm py-2 rounded-xl transition-colors"
-            >
-              {actionLoading === `paid-${tx.id}` ? 'Processing…' : 'Mark as Paid'}
-            </button>
-          </div>
+          <WithdrawalRow
+            key={tx.id}
+            tx={tx}
+            onMarkPaid={onMarkPaid}
+            actionLoading={actionLoading}
+          />
         ))
       }
     </Section>
@@ -521,11 +557,27 @@ export default function AdminPage() {
     setActionLoading(null)
   }
 
-  const markWithdrawalPaid = async (id) => {
+  const markWithdrawalPaid = async (id, file) => {
     setActionLoading(`paid-${id}`)
-    await supabase.from('transactions').update({ status: 'completed' }).eq('id', id)
-    load()
-    setActionLoading(null)
+    try {
+      let proofUrl = null
+      if (file) {
+        const ext = file.name.split('.').pop()
+        const path = `withdrawal-proofs/${id}/${Date.now()}.${ext}`
+        const { error: uploadErr } = await supabase.storage.from('proofs').upload(path, file)
+        if (!uploadErr) {
+          const { data: { publicUrl } } = supabase.storage.from('proofs').getPublicUrl(path)
+          proofUrl = publicUrl
+        }
+      }
+      await supabase.from('transactions').update({
+        status: 'completed',
+        ...(proofUrl ? { proof_url: proofUrl } : {}),
+      }).eq('id', id)
+      load()
+    } finally {
+      setActionLoading(null)
+    }
   }
 
   const handleSignOut = async () => { await signOut(); navigate('/auth') }
@@ -596,7 +648,7 @@ export default function AdminPage() {
         <div className="px-4 pt-2 space-y-4">
           {activeTab === 'Overview'    && <OverviewTab pendingPayments={payments.length} pendingWithdrawals={withdrawals.length} />}
           {activeTab === 'Payments'    && <PaymentsTab payments={payments} onApprove={approvePayment} onReject={rejectPayment} actionLoading={actionLoading} />}
-          {activeTab === 'Withdrawals' && <WithdrawalsTab withdrawals={withdrawals} onMarkPaid={markWithdrawalPaid} actionLoading={actionLoading} />}
+          {activeTab === 'Withdrawals' && <WithdrawalsTab withdrawals={withdrawals} onMarkPaid={(id, file) => markWithdrawalPaid(id, file)} actionLoading={actionLoading} />}
           {activeTab === 'Users'       && <UsersTab />}
           {activeTab === 'News'        && <NewsTab />}
         </div>
