@@ -1,11 +1,9 @@
 User-agent: *
 Allow: /
 
-# Public pages
-Allow: /auth
-Allow: /register
+# Block admin and private pages from indexing
+Disallow: /spinwheel/#/admin
+Disallow: /spinwheel/#/profile
+Disallow: /spinwheel/#/withdraw
 
-# Block private pages from indexing
-Disallow: /admin
-
-Sitemap: https://spinwheel.vercel.app/sitemap.xml
+Sitemap: https://nikiradigiworld-oss.github.io/spinwheel/sitemap.xml
