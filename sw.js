@@ -1,12 +1,15 @@
-const CACHE = 'spinsip-v1'
-const OFFLINE_URLS = [
+const CACHE = 'spinsip-v2'
+
+const PRECACHE = [
   '/spinwheel/',
   '/spinwheel/index.html',
+  '/spinwheel/manifest.json',
+  '/spinwheel/favicon.svg',
 ]
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(OFFLINE_URLS))
+    caches.open(CACHE).then(c => c.addAll(PRECACHE))
   )
   self.skipWaiting()
 })
@@ -22,7 +25,42 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return
+  const url = new URL(e.request.url)
+
+  // Network-first for Supabase API calls
+  if (url.hostname.includes('supabase.co')) {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match(e.request))
+    )
+    return
+  }
+
+  // Cache-first for static assets (JS, CSS, images, fonts)
+  if (
+    url.pathname.match(/\.(js|css|svg|png|jpg|jpeg|webp|woff2?|ico)$/) ||
+    url.pathname.startsWith('/spinwheel/assets/')
+  ) {
+    e.respondWith(
+      caches.open(CACHE).then(async cache => {
+        const cached = await cache.match(e.request)
+        if (cached) return cached
+        const fresh = await fetch(e.request)
+        if (fresh.ok) cache.put(e.request, fresh.clone())
+        return fresh
+      })
+    )
+    return
+  }
+
+  // Network-first for HTML pages (always get latest)
   e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+    fetch(e.request)
+      .then(res => {
+        if (res.ok) {
+          caches.open(CACHE).then(c => c.put(e.request, res.clone()))
+        }
+        return res
+      })
+      .catch(() => caches.match(e.request) || caches.match('/spinwheel/'))
   )
 })
