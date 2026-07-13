@@ -1,27 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <defs>
-    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#7c3aed"/>
-      <stop offset="100%" stop-color="#1d4ed8"/>
-    </radialGradient>
-  </defs>
-  <!-- Background circle -->
-  <circle cx="50" cy="50" r="50" fill="url(#bg)"/>
-  <!-- Wheel segments -->
-  <path d="M50 50 L50 10 A40 40 0 0 1 84.6 30 Z" fill="#a855f7" opacity="0.9"/>
-  <path d="M50 50 L84.6 30 A40 40 0 0 1 84.6 70 Z" fill="#6366f1" opacity="0.9"/>
-  <path d="M50 50 L84.6 70 A40 40 0 0 1 50 90 Z" fill="#8b5cf6" opacity="0.9"/>
-  <path d="M50 50 L50 90 A40 40 0 0 1 15.4 70 Z" fill="#4f46e5" opacity="0.9"/>
-  <path d="M50 50 L15.4 70 A40 40 0 0 1 15.4 30 Z" fill="#7c3aed" opacity="0.9"/>
-  <path d="M50 50 L15.4 30 A40 40 0 0 1 50 10 Z" fill="#6d28d9" opacity="0.9"/>
-  <!-- Divider lines -->
-  <line x1="50" y1="50" x2="50" y2="10"    stroke="#0d0825" stroke-width="2"/>
-  <line x1="50" y1="50" x2="84.6" y2="30"  stroke="#0d0825" stroke-width="2"/>
-  <line x1="50" y1="50" x2="84.6" y2="70"  stroke="#0d0825" stroke-width="2"/>
-  <line x1="50" y1="50" x2="50" y2="90"    stroke="#0d0825" stroke-width="2"/>
-  <line x1="50" y1="50" x2="15.4" y2="70"  stroke="#0d0825" stroke-width="2"/>
-  <line x1="50" y1="50" x2="15.4" y2="30"  stroke="#0d0825" stroke-width="2"/>
-  <!-- Center circle -->
-  <circle cx="50" cy="50" r="12" fill="#0d0825" stroke="#a855f7" stroke-width="2"/>
-  <text x="50" y="54" text-anchor="middle" fill="white" font-size="9" font-weight="bold" font-family="sans-serif">S</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="170 40 340 340">
+  <g transform="translate(340,230)">
+    <g transform="rotate(-90)">
+      <path d="M0 0 L150 0 A150 150 0 0 1 106.07 106.07 Z" fill="#7F77DD"/>
+      <path d="M0 0 L106.07 106.07 A150 150 0 0 1 0 150 Z" fill="#1D9E75"/>
+      <path d="M0 0 L0 150 A150 150 0 0 1 -106.07 106.07 Z" fill="#D85A30"/>
+      <path d="M0 0 L-106.07 106.07 A150 150 0 0 1 -150 0 Z" fill="#D4537E"/>
+      <path d="M0 0 L-150 0 A150 150 0 0 1 -106.07 -106.07 Z" fill="#378ADD"/>
+      <path d="M0 0 L-106.07 -106.07 A150 150 0 0 1 0 -150 Z" fill="#EF9F27"/>
+      <path d="M0 0 L0 -150 A150 150 0 0 1 106.07 -106.07 Z" fill="#639922"/>
+      <path d="M0 0 L106.07 -106.07 A150 150 0 0 1 150 0 Z" fill="#F09595"/>
+    </g>
+    <circle cx="0" cy="0" r="150" fill="none" stroke="#1a1a1a" stroke-width="3"/>
+    <circle cx="0" cy="0" r="22" fill="#ffffff" stroke="#1a1a1a" stroke-width="3"/>
+    <path d="M0 -190 L-22 -150 L22 -150 Z" fill="#1a1a1a"/>
+  </g>
 </svg>
