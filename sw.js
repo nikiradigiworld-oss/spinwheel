@@ -1,10 +1,10 @@
-const CACHE = 'spinsip-v2'
+const CACHE = 'spinmagic-v1'
 
 const PRECACHE = [
-  '/spinwheel/',
-  '/spinwheel/index.html',
-  '/spinwheel/manifest.json',
-  '/spinwheel/favicon.svg',
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/favicon.svg',
 ]
 
 self.addEventListener('install', e => {
@@ -32,7 +32,7 @@ self.addEventListener('fetch', e => {
 
   if (
     url.pathname.match(/\.(js|css|svg|png|jpg|jpeg|webp|woff2?|ico)$/) ||
-    url.pathname.startsWith('/spinwheel/assets/')
+    url.pathname.startsWith('/assets/')
   ) {
     e.respondWith(
       caches.open(CACHE).then(async cache => {
@@ -52,23 +52,23 @@ self.addEventListener('fetch', e => {
         if (res.ok) caches.open(CACHE).then(c => c.put(e.request, res.clone()))
         return res
       })
-      .catch(() => caches.match(e.request) || caches.match('/spinwheel/'))
+      .catch(() => caches.match(e.request) || caches.match('/'))
   )
 })
 
 // ── Push Notifications ───────────────────────────────────────────────────────
 
 self.addEventListener('push', e => {
-  let data = { title: 'Spin & SIP Money', body: 'You have a new notification!', icon: '/spinwheel/favicon.svg' }
+  let data = { title: 'Spinmagic', body: 'You have a new notification!', icon: '/favicon.svg' }
   try { data = { ...data, ...e.data.json() } } catch {}
 
   e.waitUntil(
     self.registration.showNotification(data.title, {
       body:    data.body,
-      icon:    data.icon || '/spinwheel/favicon.svg',
-      badge:   '/spinwheel/favicon.svg',
+      icon:    data.icon || '/favicon.svg',
+      badge:   '/favicon.svg',
       tag:     data.tag  || 'spinsip',
-      data:    { url: data.url || '/spinwheel/' },
+      data:    { url: data.url || '/' },
       vibrate: [200, 100, 200],
     })
   )
@@ -76,7 +76,7 @@ self.addEventListener('push', e => {
 
 self.addEventListener('notificationclick', e => {
   e.notification.close()
-  const url = e.notification.data?.url || '/spinwheel/'
+  const url = e.notification.data?.url || '/'
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
       const existing = list.find(c => c.url.includes('spinwheel'))
