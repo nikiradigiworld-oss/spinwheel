@@ -36,7 +36,7 @@
 
   <!-- Pill badge -->
   <rect x="120" y="130" width="220" height="44" rx="22" fill="url(#purple)" opacity="0.9"/>
-  <text x="230" y="158" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="18" fill="white">SAM Infinity Resources</text>
+  <text x="230" y="158" text-anchor="middle" font-family="Arial" font-weight="bold" font-size="18" fill="white">Spinmagic</text>
 
   <!-- Main title -->
   <text x="120" y="270" font-family="Arial Black, Arial" font-weight="900" font-size="78" fill="white">Spin &amp; SIP</text>
@@ -52,5 +52,5 @@
   <text x="770" y="500" font-family="Arial" font-size="22" fill="#6b7280">🤝 Referral Bonus</text>
 
   <!-- Bottom URL -->
-  <text x="120" y="580" font-family="Arial" font-size="20" fill="#4b5563">nikiradigiworld-oss.github.io/spinwheel</text>
+  <text x="120" y="580" font-family="Arial" font-size="20" fill="#4b5563">spinmagic.fun</text>
 </svg>

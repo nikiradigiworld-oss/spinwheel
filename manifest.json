@@ -1,9 +1,9 @@
 {
-  "name": "Spin & SIP Money",
-  "short_name": "Spin & SIP",
-  "description": "Spin the wheel daily to earn tokens and withdraw real rewards. A product of SAM Infinity Resources.",
-  "start_url": "/spinwheel/",
-  "scope": "/spinwheel/",
+  "name": "Spinmagic",
+  "short_name": "Spinmagic",
+  "description": "Spin the wheel daily to earn tokens and withdraw real rewards.",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0d0825",
@@ -11,7 +11,7 @@
   "categories": ["games", "finance", "entertainment"],
   "icons": [
     {
-      "src": "/spinwheel/favicon.svg",
+      "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
