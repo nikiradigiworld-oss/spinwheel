@@ -79,7 +79,7 @@ self.addEventListener('notificationclick', e => {
   const url = e.notification.data?.url || '/'
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
-      const existing = list.find(c => c.url.includes('spinwheel'))
+      const existing = list.find(c => c.url.includes('spinmagic.fun'))
       if (existing) return existing.focus()
       return clients.openWindow(url)
     })
